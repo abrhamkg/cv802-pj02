@@ -400,7 +400,7 @@ class ColmapAPI:
             print("Total Reconstruction Time",end-start)
             
         #Load saved bin model
-        cameras_bin, images_bin, points3D_bin = read_model(os.path.join(self.data_path, "0"), ext=".bin")
+        cameras_bin, images_bin, points3D_bin = read_model(os.path.join(self.data_path, "sfm"), ext=".bin")
 
         #Projection Error calculation
         proj_error=0
@@ -458,7 +458,11 @@ class ColmapAPI:
         
         # Add cameras
         colmap_cameras = camera
+        o3d.io.write_point_cloud("point_cloud_for_meshing.ply", pcd, write_ascii=True)
 
+        cl, ind = pcd.remove_statistical_outlier(nb_neighbors=5, std_ratio=1.0)
+
+        o3d.io.write_point_cloud("point_cloud_point2mesh.xyz", cl, write_ascii=True)
         ####### End of your code #####################
 
         self._pcd = pcd

@@ -16,6 +16,8 @@ import os.path as osp
 import platform
 import sys
 
+import pymeshlab as ml
+
 from modules.colmap.api import ColmapAPI
 from modules.gui.settings import Settings
 from modules.point2mesh.point2mesh import run_point2mesh
@@ -37,6 +39,8 @@ class AppWindow:
 
     def __init__(self, width, height):
         self.settings = Settings()
+        self.input_pc = "point_cloud.ply"
+        self.initial_mesh = "meshdata_nn.obj"
 
         # Call COLMAP API 
         self.colmap_api = ColmapAPI(
@@ -127,7 +131,7 @@ class AppWindow:
         # Add Mesh generation button
         self._mesh_button = gui.Button("Generate Mesh")
         self._mesh_button.horizontal_padding_em = 0.2
-        self._mesh_button.enabled = False
+        self._mesh_button.enabled = True
         self._mesh_button.set_on_clicked(self._on_mesh_button)
 
 
@@ -226,7 +230,27 @@ class AppWindow:
         self._apply_settings()
 
     def _on_mesh_button(self):
-        run_point2mesh(self.initial_mesh, self.input_pc)
+        print(os.path.abspath(os.curdir))
+        pcd = o3d.io.read_point_cloud(
+            os.path.join('datasets', self.input_pc)
+        )  # Use .ply, .pcd, etc.
+
+        cl, ind = pcd.remove_statistical_outlier(nb_neighbors=5, std_ratio=1.0)
+        o3d.io.write_point_cloud("point_cloud_normals.xyz", cl, write_ascii=True)
+
+        ms = ml.MeshSet()
+        self.input_pc = "/workspace/pj02/datasets/giraffe.ply"
+        # s
+        # load colored pointcloud
+        ms.load_new_mesh(self.input_pc)
+        # load mesh (it is now the "current" mesh, to which the filters are applied)
+        # ms.load_new_mesh("mesh.ply")
+        ms.apply_filter("compute_texcoord_by_function_per_vertex")
+        ms.apply_filter("compute_texcoord_transfer_vertex_to_wedge")
+        ms.apply_filter("compute_texcoord_parametrization_triangle_trivial_per_wedge", textdim=4096)
+        ms.apply_filter("transfer_attributes_to_texture_per_vertex", sourcemesh=0, targetmesh=1, textw=4096, texth=4096)
+        ms.save_current_mesh("mesh_tex.obj")
+
 
     def _on_fit_colmap_button(self):
         self.colmap_api.estimate_cameras()

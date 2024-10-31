@@ -7,6 +7,9 @@
           <mappings>
             <mapping deploy="/workspace/pj02" local="$PROJECT_DIR$" />
           </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/modules/point2mesh/Manifold" />
+          </excludedPaths>
         </serverdata>
       </paths>
     </serverData>

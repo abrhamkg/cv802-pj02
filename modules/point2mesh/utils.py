@@ -2,7 +2,7 @@ import torch
 import numpy as np
 import os
 import uuid
-from options import MANIFOLD_DIR
+from modules.point2mesh.options import MANIFOLD_DIR
 import glob
 
 def manifold_upsample(mesh, save_path, Mesh, num_faces=2000, res=3000, simplify=True):

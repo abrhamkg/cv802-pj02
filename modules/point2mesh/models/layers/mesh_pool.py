@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from models.layers.mesh_union import MeshUnion
+from modules.point2mesh.models.layers.mesh_union import MeshUnion
 import numpy as np
 
 
