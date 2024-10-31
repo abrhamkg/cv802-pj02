@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 import open3d as o3d
 import os
@@ -10,6 +12,9 @@ from utils.thread_utils import run_on_thread
 import struct
 import time
 
+from hloc import extract_features, match_features, reconstruction, visualization, pairs_from_exhaustive
+from hloc.visualization import plot_images, read_image
+from hloc.utils import viz_3d
 
 VOCAB_PATH = 'modules/colmap/vocab_tree_flickr100K_words32K.bin'
 
@@ -381,32 +386,34 @@ class ColmapAPI:
         if not os.path.exists(colmap_dir):
             os.makedirs(colmap_dir)
 
+        print("-------------------", self.data_path)
+        images = Path(os.path.join(self.data_path, 'train'))
+        outputs = Path(os.path.join(self.data_path, 'output'))
+        sfm_pairs = outputs / 'pairs-sfm.txt'
+        loc_pairs = outputs / 'pairs-loc.txt'
+        sfm_dir = outputs / 'sfm'
+        features = outputs / 'features.h5'
+        matches = outputs / 'matches.h5'
         if recompute:
-            #Extraction of Sift Features
-            start=time.time()
-            pycolmap.extract_features(self.database_path,self.image_dir,camera_model=self.camera_model)
-            #Feature matching between image pairs
-            if self._matcher=="exhaustive_matcher":
-                pycolmap.match_exhaustive(self.database_path)
-            elif self._matcher=="sequential_matcher":
-                pycolmap.match_sequential(self.database_path)
-            elif self._matcher=="vocab_three_matcher":
-                pycolmap.match_vocabtree(self.database_path)
-            print("Selected Matcher: ",self.matcher)
+            feature_conf = extract_features.confs['disk']
+            matcher_conf = match_features.confs['NN-ratio']
+            matcher_conf = match_features.confs['disk+lightglue']
 
-            #Recover 3D points / camera poses , and save results
-            pycolmap.incremental_mapping(self.database_path,self.image_dir,self.data_path)
-            end=time.time()
-            print("Total Reconstruction Time",end-start)
-            
+            references = [str(p.relative_to(images)) for p in (images / 'mapping/').iterdir()]
+            extract_features.main(feature_conf, images, image_list=references, feature_path=features)
+            pairs_from_exhaustive.main(sfm_pairs, image_list=references)
+            match_features.main(matcher_conf, sfm_pairs, features=features, matches=matches);
+
+            model = reconstruction.main(sfm_dir, images, sfm_pairs, features, matches, image_list=references)
+
         #Load saved bin model
         cameras_bin, images_bin, points3D_bin = read_model(os.path.join(self.data_path, "sfm"), ext=".bin")
 
         #Projection Error calculation
         proj_error=0
         for e in points3D_bin.keys():
-            proj_error+=points3D_bin[e].error.item()  
-            
+            proj_error+=points3D_bin[e].error.item()
+
         proj_error/=len(points3D_bin.keys())
         print("Mean Reprojection Error",proj_error)
 

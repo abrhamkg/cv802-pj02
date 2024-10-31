@@ -390,26 +390,26 @@ class AppWindow:
         self.colmap_api.data_path = data_path
 
         # Verify if there is any image in this folder
-        if len(self.colmap_api._list_images_in_folder(self.colmap_api.image_dir)) == 0:
-            self.colmap_api.data_path = None
-            em = self.window.theme.font_size
-            dlg = gui.Dialog("Error")
-
-            # Add the text
-            dlg_layout = gui.Vert(em / 2, gui.Margins(em, em, em, em))
-            dlg_layout.add_child(gui.Label("There is no image in this folder! Choose another one."))
-
-            ok = gui.Button("OK")
-            ok.set_on_clicked(self._on_error_ok)
-
-            h = gui.Horiz()
-            h.add_stretch()
-            h.add_child(ok)
-            h.add_stretch()
-            dlg_layout.add_child(h)
-
-            dlg.add_child(dlg_layout)
-            self.window.show_dialog(dlg)
+        # if len(self.colmap_api._list_images_in_folder(self.colmap_api.image_dir)) == 0:
+        #     self.colmap_api.data_path = None
+        #     em = self.window.theme.font_size
+        #     dlg = gui.Dialog("Error")
+        #
+        #     # Add the text
+        #     dlg_layout = gui.Vert(em / 2, gui.Margins(em, em, em, em))
+        #     dlg_layout.add_child(gui.Label("There is no image in this folder! Choose another one."))
+        #
+        #     ok = gui.Button("OK")
+        #     ok.set_on_clicked(self._on_error_ok)
+        #
+        #     h = gui.Horiz()
+        #     h.add_stretch()
+        #     h.add_child(ok)
+        #     h.add_stretch()
+        #     dlg_layout.add_child(h)
+        #
+        #     dlg.add_child(dlg_layout)
+        #     self.window.show_dialog(dlg)
 
         self._fit_colmap_button.enabled = True
 
