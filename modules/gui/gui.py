@@ -18,6 +18,7 @@ import sys
 
 from modules.colmap.api import ColmapAPI
 from modules.gui.settings import Settings
+from modules.point2mesh.point2mesh import run_point2mesh
 from utils.thread_utils import run_on_thread
 
 isMacOS = (platform.system() == "Darwin")
@@ -225,7 +226,7 @@ class AppWindow:
         self._apply_settings()
 
     def _on_mesh_button(self):
-        pass
+        run_point2mesh(self.initial_mesh, self.input_pc)
 
     def _on_fit_colmap_button(self):
         self.colmap_api.estimate_cameras()

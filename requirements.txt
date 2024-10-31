@@ -1,2 +1,18 @@
-open3d==0.18.0
-numpy==1.26.1
+name: point2mesh
+channels:
+  - pytorch
+  - defaults
+  - conda-forge
+  - fvcore
+  - nvidia
+dependencies:
+  - python=3.10
+  - numpy=1.26.*
+  - pytorch=2.1.0
+  - torchvision=0.16.0
+  - pytorch-cuda=12.*
+  - fvcore=0.1
+  - open3d==0.18.0
+  - pip
+  - pip:
+    - pytest==5.4.2
