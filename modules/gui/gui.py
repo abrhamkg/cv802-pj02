@@ -508,29 +508,31 @@ class AppWindow:
         self._scene.scene.clear_geometry()
 
         self.colmap_api.data_path = data_path
-        if self.colmap_api.check_colmap_folder_valid():
-            self.colmap_api.estimate_cameras(recompute=False)
-            self._add_geometries_from_colmap()
-        else:
-            self.colmap_api.data_path = None
-            em = self.window.theme.font_size
-            dlg = gui.Dialog("Error")
-
-            # Add the text
-            dlg_layout = gui.Vert(em / 2, gui.Margins(em, em, em, em))
-            dlg_layout.add_child(gui.Label("Picked folder does not contain precomputed COLMAP data!"))
-
-            ok = gui.Button("OK")
-            ok.set_on_clicked(self._on_error_ok)
-
-            h = gui.Horiz()
-            h.add_stretch()
-            h.add_child(ok)
-            h.add_stretch()
-            dlg_layout.add_child(h)
-
-            dlg.add_child(dlg_layout)
-            self.window.show_dialog(dlg)
+        self.colmap_api.estimate_cameras(recompute=False)
+        self._add_geometries_from_colmap()
+        # if self.colmap_api.check_colmap_folder_valid():
+        #     self.colmap_api.estimate_cameras(recompute=False)
+        #     self._add_geometries_from_colmap()
+        # else:
+        #     self.colmap_api.data_path = None
+        #     em = self.window.theme.font_size
+        #     dlg = gui.Dialog("Error")
+        #
+        #     # Add the text
+        #     dlg_layout = gui.Vert(em / 2, gui.Margins(em, em, em, em))
+        #     dlg_layout.add_child(gui.Label("Picked folder does not contain precomputed COLMAP data!"))
+        #
+        #     ok = gui.Button("OK")
+        #     ok.set_on_clicked(self._on_error_ok)
+        #
+        #     h = gui.Horiz()
+        #     h.add_stretch()
+        #     h.add_child(ok)
+        #     h.add_stretch()
+        #     dlg_layout.add_child(h)
+        #
+        #     dlg.add_child(dlg_layout)
+        #     self.window.show_dialog(dlg)
 
     def _add_geometries_from_colmap(self):
         w = self.window

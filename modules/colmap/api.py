@@ -407,8 +407,10 @@ class ColmapAPI:
             model = reconstruction.main(sfm_dir, images, sfm_pairs, features, matches, image_list=references)
 
         #Load saved bin model
-        cameras_bin, images_bin, points3D_bin = read_model(os.path.join(self.data_path, "sfm"), ext=".bin")
-
+        cameras_bin, images_bin, points3D_bin = read_model(
+            sfm_dir,
+            ext=".bin")
+        pdb.set_trace()
         #Projection Error calculation
         proj_error=0
         for e in points3D_bin.keys():
